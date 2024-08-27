@@ -54,3 +54,30 @@ def create_post(request):
     else:
         form = forms.BlogForm()
     return render(request,'create_post.html',{'form':form})
+
+@login_required
+
+def update_post(request,id):
+    blog_post=get_object_or_404(models.Blogs,id=id)
+    if blog_post.author!=request.user:
+        return redirect('home')
+    model = models.Blogs.objects.get(id=id)
+    form = forms.BlogForm(request.POST or None,request.FILES,instance=model)
+    if form.is_valid():
+        form.save()
+        return redirect('home')
+    return render(request,'update.html',{'form':form , 'model':model})
+
+
+@login_required
+
+def delete_post(request):
+    blog_post = get_object_or_404(models.Blogs,id=id)
+    if blog_post.author==request.user:
+        return redirect('home')
+    model = models.Blogs.objects.get(id=id)
+    form = forms.BlogForm(request.POST or None, request.FILES,instance=model)
+    if request.method=='POST':
+        model.delete()
+        return redirect('home')
+    return render(request,'delete.html',{'form':form})
